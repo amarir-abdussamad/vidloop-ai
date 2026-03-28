@@ -29,6 +29,10 @@ Do NOT generate generic titles. Every title, description, and concept must refle
 the SPECIFIC topics, stories, moments, and details found in the transcript.
 If the transcript is in Arabic, generate output in Arabic. English → English. Etc.
 
+- CRITICAL: Write titles in ONE language only — the same language as the transcript
+- Do NOT mix English words into Arabic titles or vice versa
+- If the transcript is in Arabic (Darija or MSA), every single word in every title must be Arabic
+
 1. TITLES: Write exactly 10 YouTube titles.
    - FIRST read the transcript carefully and identify: the main topic, key moments, surprising facts, conflicts, results, or stories
    - THEN build each title around one of those specific extracted points
