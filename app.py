@@ -3,6 +3,7 @@ from modules.auth import show_auth_page, logout
 from modules.onboarding import has_completed_onboarding, show_onboarding_page, get_user_profile
 from modules.youtube_fetcher import process_youtube_url
 from modules.rate_limiter import check_rate_limit, increment_usage
+from modules.ai_generator import generate_content
 
 st.set_page_config(
     page_title="VidLoop AI",
@@ -30,8 +31,8 @@ if "user_profile" not in st.session_state:
     st.session_state["user_profile"] = get_user_profile(user_id)
 
 # ── Sidebar ────────────────────────────────────────────────────
-st.sidebar.title("🎬 VidLoop AI")
-st.sidebar.write(f"👤 {st.session_state['user'].email}")
+st.sidebar.title("VidLoop AI")
+st.sidebar.write(f"{st.session_state['user'].email}")
 profile = st.session_state["user_profile"]
 tier = "free"  # hardcoded for now — will come from DB in v1.5
 if profile:
@@ -49,7 +50,7 @@ if st.sidebar.button("Logout"):
     logout()
 
 # ── Main Page ──────────────────────────────────────────────────
-st.title("🎬 VidLoop AI")
+st.title("VidLoop AI")
 st.subheader("Paste your YouTube video URL to get started")
 st.divider()
 
@@ -83,9 +84,34 @@ if st.button("Analyze Video", use_container_width=True):
 
     st.success(f"Got it! **{result['title']}**")
 
-    with st.expander("Raw data (debug view)"):
-        st.write(f"**Channel:** {result['channel_title']}")
-        st.write(f"**Views:** {result['view_count']:,}")
-        st.write(f"**Likes:** {result['like_count']:,}")
-        st.write(f"**Transcript source:** {result['transcript_source']}")
-        st.write(f"**Transcript preview:** {result['transcript'][:300]}...")
+    # ── AI Generation ──────────────────────────────────────────
+    with st.spinner("AI is analyzing your video and generating content..."):
+        ai_result = generate_content(
+            user_profile=st.session_state["user_profile"],
+            video_data=result
+        )
+
+    if "error" in ai_result:
+        st.error(ai_result["error"])
+        st.stop()
+
+    # Save AI results to session for results page (Day 7)
+    st.session_state["ai_result"] = ai_result
+
+    # ── Temporary debug display ────────────────────────────────
+    st.divider()
+    st.subheader("AI Output (debug view)")
+
+    st.markdown("**Titles:**")
+    for i, title in enumerate(ai_result.get("titles", []), 1):
+        st.write(f"{i}. {title}")
+
+    st.markdown("**Descriptions:**")
+    for i, desc in enumerate(ai_result.get("descriptions", []), 1):
+        with st.expander(f"Description {i}"):
+            st.write(desc)
+
+    st.markdown("**Thumbnail Concepts:**")
+    for i, concept in enumerate(ai_result.get("thumbnail_concepts", []), 1):
+        with st.expander(f"Concept {i}"):
+            st.write(concept)
