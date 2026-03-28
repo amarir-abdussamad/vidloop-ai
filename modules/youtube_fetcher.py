@@ -51,9 +51,16 @@ def fetch_video_metadata(video_id: str) -> dict:
 def fetch_transcript_from_captions(video_id: str) -> str | None:
     try:
         api = YouTubeTranscriptApi()
-        transcript_data = api.fetch(video_id)
-        full_text = " ".join([entry.text for entry in transcript_data])
+
+        # List all available transcripts for this video
+        transcript_list = api.list(video_id)
+
+        # Grab the first available one — any language
+        transcript = next(iter(transcript_list))
+        data = transcript.fetch()
+        full_text = " ".join([entry.text for entry in data])
         return full_text.strip()
+
     except Exception as e:
         st.warning(f"Caption error: {e}")
         return None

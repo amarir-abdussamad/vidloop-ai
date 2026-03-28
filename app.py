@@ -1,5 +1,6 @@
 import streamlit as st
-from modules.auth import show_auth_page, logout
+import time
+from modules.auth import show_auth_page, logout, restore_session
 from modules.onboarding import has_completed_onboarding, show_onboarding_page, get_user_profile
 from modules.youtube_fetcher import process_youtube_url
 from modules.rate_limiter import check_rate_limit, increment_usage
@@ -11,6 +12,9 @@ st.set_page_config(
     page_icon="🎬",
     layout="centered"
 )
+
+# ── Restore session on refresh ─────────────────────────────────
+restore_session()
 
 # ── Auth guard ─────────────────────────────────────────────────
 if "user" not in st.session_state:
@@ -55,12 +59,14 @@ st.title("VidLoop AI")
 st.subheader("Paste your YouTube video URL to get started")
 st.divider()
 
-url = st.text_input(
-    "YouTube Video URL",
-    placeholder="https://www.youtube.com/watch?v=...",
-)
+with st.form("analyze_form"):
+    url = st.text_input(
+        "YouTube Video URL",
+        placeholder="https://www.youtube.com/watch?v=...",
+    )
+    submitted = st.form_submit_button("Analyze Video", use_container_width=True)
 
-if st.button("Analyze Video", use_container_width=True):
+if submitted:
     if not url:
         st.warning("Please paste a YouTube URL first.")
         st.stop()
@@ -70,6 +76,15 @@ if st.button("Analyze Video", use_container_width=True):
     if not allowed:
         st.error(f"You've used all {limit} free generations this month. Upgrade to Pro for unlimited access!")
         st.stop()
+
+    # ── Cooldown check ─────────────────────────────────────────────
+    last_analysis = st.session_state.get("last_analysis_time")
+    if last_analysis:
+        elapsed = time.time() - last_analysis
+        remaining = int(60 - elapsed)
+        if remaining > 0:
+            st.warning(f"Please wait {remaining} seconds before analyzing another video.")
+            st.stop()
 
     # ── Step 1: Fetch video ────────────────────────────────────
     with st.spinner("Fetching video data and transcript..."):
@@ -96,6 +111,7 @@ if st.button("Analyze Video", use_container_width=True):
     st.session_state["video_data"] = video_data
     st.session_state["ai_result"] = ai_result
     increment_usage(user_id, tier)
+    st.session_state["last_analysis_time"] = time.time()
 
     # ── Step 4: Show results ───────────────────────────────────
     show_results(ai_result, video_data)

@@ -18,6 +18,8 @@ def show_results(ai_result: dict, video_data: dict):
         st.metric("Likes", f"{video_data.get('like_count', 0):,}")
     with col3:
         st.metric("Transcript", video_data.get("transcript_source", "N/A"))
+    with st.expander("📄 View transcript used by AI"):
+        st.write(video_data.get("transcript", "No transcript available"))
 
     st.divider()
 

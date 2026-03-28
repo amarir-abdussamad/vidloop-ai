@@ -19,14 +19,15 @@ def show_auth_page():
     with tab_signup:
         _render_signup()
 
-
 def _render_login():
     st.subheader("Welcome back")
 
-    email = st.text_input("Email", key="login_email")
-    password = st.text_input("Password", type="password", key="login_password")
+    with st.form("login_form"):
+        email = st.text_input("Email", key="login_email")
+        password = st.text_input("Password", type="password", key="login_password")
+        submitted = st.form_submit_button("Login", use_container_width=True)
 
-    if st.button("Login", use_container_width=True):
+    if submitted:
         if not email or not password:
             st.warning("Please fill in both fields.")
             return
@@ -41,14 +42,15 @@ def _render_login():
         except Exception as e:
             st.error(f"Login failed: {e}")
 
-
 def _render_signup():
     st.subheader("Create your free account")
 
-    email = st.text_input("Email", key="signup_email")
-    password = st.text_input("Password (min 6 chars)", type="password", key="signup_password")
+    with st.form("signup_form"):
+        email = st.text_input("Email", key="signup_email")
+        password = st.text_input("Password (min 6 chars)", type="password", key="signup_password")
+        submitted = st.form_submit_button("Create Account", use_container_width=True)
 
-    if st.button("Create Account", use_container_width=True):
+    if submitted:
         if not email or not password:
             st.warning("Please fill in both fields.")
             return
@@ -56,17 +58,32 @@ def _render_signup():
             st.warning("Password must be at least 6 characters.")
             return
         try:
-            response = supabase.auth.sign_up({
+            supabase.auth.sign_up({
                 "email": email,
                 "password": password
             })
-            st.success("Account created! Please check your email to confirm, then log in.")
+            st.success("Account created! Please log in.")
         except Exception as e:
             st.error(f"Signup failed: {e}")
-
 
 def logout():
     """Call this from anywhere to log the user out."""
     supabase.auth.sign_out()
     st.session_state.clear()
     st.rerun()
+
+def restore_session():
+    """
+    Called on every app load. Tries to restore the Supabase session
+    so the user doesn't have to log in again after a refresh.
+    """
+    if "user" in st.session_state:
+        return  # Already have a session, nothing to do
+
+    try:
+        session = supabase.auth.get_session()
+        if session and session.user:
+            st.session_state["user"] = session.user
+            st.session_state["session"] = session
+    except Exception:
+        pass  # No session found — user will see login page
