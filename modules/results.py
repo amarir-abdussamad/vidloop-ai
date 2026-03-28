@@ -18,7 +18,7 @@ def show_results(ai_result: dict, video_data: dict):
         st.metric("Likes", f"{video_data.get('like_count', 0):,}")
     with col3:
         st.metric("Transcript", video_data.get("transcript_source", "N/A"))
-    with st.expander("📄 View transcript used by AI"):
+    with st.expander("View transcript used by AI"):
         st.write(video_data.get("transcript", "No transcript available"))
 
     st.divider()
@@ -32,7 +32,7 @@ def show_results(ai_result: dict, video_data: dict):
 
     # ── Tab 1: Titles ──────────────────────────────────────────
     with tab_titles:
-        st.subheader("10 Click-Worthy Titles")
+        st.subheader("5 Click-Worthy Titles")
         st.caption("Pick your favorite and A/B test it against your current title.")
         st.divider()
 
@@ -49,7 +49,7 @@ def show_results(ai_result: dict, video_data: dict):
 
     # ── Tab 2: Descriptions ────────────────────────────────────
     with tab_descriptions:
-        st.subheader("3 Full YouTube Descriptions")
+        st.subheader("2 Full YouTube Descriptions")
         st.caption("Each description includes a hook, key points, CTA, and hashtags.")
         st.divider()
 
@@ -70,7 +70,7 @@ def show_results(ai_result: dict, video_data: dict):
 
     # ── Tab 3: Thumbnail Concepts ──────────────────────────────
     with tab_thumbnails:
-        st.subheader("5 Thumbnail Concepts")
+        st.subheader("3 Thumbnail Concepts")
         st.caption("Hand these descriptions to a designer or paste into Midjourney/Flux.")
         st.divider()
 

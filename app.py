@@ -1,6 +1,6 @@
 import streamlit as st
 import time
-from modules.auth import show_auth_page, logout
+from modules.auth import show_auth_page, logout, restore_session
 from modules.onboarding import has_completed_onboarding, show_onboarding_page, get_user_profile
 from modules.youtube_fetcher import process_youtube_url
 from modules.rate_limiter import check_rate_limit, increment_usage
@@ -13,6 +13,7 @@ st.set_page_config(
     layout="centered"
 )
 
+restore_session()
 
 # ── Auth guard ─────────────────────────────────────────────────
 if "user" not in st.session_state:
