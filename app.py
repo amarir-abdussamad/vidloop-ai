@@ -4,6 +4,7 @@ from modules.onboarding import has_completed_onboarding, show_onboarding_page, g
 from modules.youtube_fetcher import process_youtube_url
 from modules.rate_limiter import check_rate_limit, increment_usage
 from modules.ai_generator import generate_content
+from modules.results import show_results
 
 st.set_page_config(
     page_title="VidLoop AI",
@@ -34,12 +35,12 @@ if "user_profile" not in st.session_state:
 st.sidebar.title("VidLoop AI")
 st.sidebar.write(f"{st.session_state['user'].email}")
 profile = st.session_state["user_profile"]
-tier = "free"  # hardcoded for now — will come from DB in v1.5
-if profile:
-    st.sidebar.write(f"Niche: {profile.get('niche', 'N/A')}")
-    st.sidebar.write(f"Subscribers: {profile.get('subscribers', 'N/A'):,}")
+tier = "free"
 
-# ── Rate limit display in sidebar ─────────────────────────────
+if profile:
+    st.sidebar.write(f"{profile.get('niche', 'N/A')}")
+    st.sidebar.write(f"{profile.get('subscribers', 0):,} subscribers")
+
 allowed, used, limit = check_rate_limit(user_id, tier)
 st.sidebar.divider()
 st.sidebar.write(f"Generations: {used}/{limit} this month")
@@ -70,48 +71,31 @@ if st.button("Analyze Video", use_container_width=True):
         st.error(f"You've used all {limit} free generations this month. Upgrade to Pro for unlimited access!")
         st.stop()
 
-    # ── Fetch video data ───────────────────────────────────────
+    # ── Step 1: Fetch video ────────────────────────────────────
     with st.spinner("Fetching video data and transcript..."):
-        result = process_youtube_url(url)
+        video_data = process_youtube_url(url)
 
-    if "error" in result:
-        st.error(result["error"])
+    if "error" in video_data:
+        st.error(video_data["error"])
         st.stop()
 
-    # ── Save to session + increment usage ──────────────────────
-    st.session_state["video_data"] = result
-    increment_usage(user_id, tier)
+    st.success(f"Got it! **{video_data['title']}**")
 
-    st.success(f"Got it! **{result['title']}**")
-
-    # ── AI Generation ──────────────────────────────────────────
-    with st.spinner("AI is analyzing your video and generating content..."):
+    # ── Step 2: Generate AI content ────────────────────────────
+    with st.spinner("AI is generating your titles, descriptions, and thumbnail concepts..."):
         ai_result = generate_content(
             user_profile=st.session_state["user_profile"],
-            video_data=result
+            video_data=video_data
         )
 
     if "error" in ai_result:
         st.error(ai_result["error"])
         st.stop()
 
-    # Save AI results to session for results page (Day 7)
+    # ── Step 3: Save + track usage ─────────────────────────────
+    st.session_state["video_data"] = video_data
     st.session_state["ai_result"] = ai_result
+    increment_usage(user_id, tier)
 
-    # ── Temporary debug display ────────────────────────────────
-    st.divider()
-    st.subheader("AI Output (debug view)")
-
-    st.markdown("**Titles:**")
-    for i, title in enumerate(ai_result.get("titles", []), 1):
-        st.write(f"{i}. {title}")
-
-    st.markdown("**Descriptions:**")
-    for i, desc in enumerate(ai_result.get("descriptions", []), 1):
-        with st.expander(f"Description {i}"):
-            st.write(desc)
-
-    st.markdown("**Thumbnail Concepts:**")
-    for i, concept in enumerate(ai_result.get("thumbnail_concepts", []), 1):
-        with st.expander(f"Concept {i}"):
-            st.write(concept)
+    # ── Step 4: Show results ───────────────────────────────────
+    show_results(ai_result, video_data)
