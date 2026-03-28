@@ -49,21 +49,69 @@ def fetch_video_metadata(video_id: str) -> dict:
 
 
 def fetch_transcript_from_captions(video_id: str) -> str | None:
+    import yt_dlp
+    import os
+    import tempfile
+
     try:
-        api = YouTubeTranscriptApi()
+        with tempfile.TemporaryDirectory() as tmpdir:
+            ydl_opts = {
+                "quiet": True,
+                "no_warnings": True,
+                "skip_download": True,        # don't download video
+                "writeautomaticsub": True,     # get auto-generated subs
+                "writesubtitles": True,        # get manual subs too
+                "subtitlesformat": "vtt",      # vtt format
+                "outtmpl": os.path.join(tmpdir, "sub"),
+            }
 
-        # List all available transcripts for this video
-        transcript_list = api.list(video_id)
+            url = f"https://www.youtube.com/watch?v={video_id}"
 
-        # Grab the first available one — any language
-        transcript = next(iter(transcript_list))
-        data = transcript.fetch()
-        full_text = " ".join([entry.text for entry in data])
-        return full_text.strip()
+            with yt_dlp.YoutubeDL(ydl_opts) as ydl:
+                info = ydl.extract_info(url, download=True)
+
+            # Find the downloaded subtitle file
+            for f in os.listdir(tmpdir):
+                if f.endswith(".vtt"):
+                    with open(os.path.join(tmpdir, f), "r", encoding="utf-8") as file:
+                        vtt_content = file.read()
+                    return _parse_vtt(vtt_content)
+
+            return None
 
     except Exception as e:
         st.warning(f"Caption error: {e}")
         return None
+
+
+def _parse_vtt(vtt: str) -> str:
+    """Strip VTT timestamps and formatting, return plain text."""
+    import re
+    lines = vtt.split("\n")
+    text_lines = []
+    for line in lines:
+        line = line.strip()
+        # Skip empty lines, WEBVTT header, timestamps, and NOTE lines
+        if not line:
+            continue
+        if line.startswith("WEBVTT") or line.startswith("NOTE") or line.startswith("Kind:") or line.startswith("Language:"):
+            continue
+        if re.match(r"^\d{2}:\d{2}", line):  # timestamp line
+            continue
+        if re.match(r"^\d+$", line):  # sequence number
+            continue
+        # Remove HTML tags like <c>, </c>, <00:00:00.000>
+        line = re.sub(r"<[^>]+>", "", line)
+        if line:
+            text_lines.append(line)
+
+    # Remove duplicate consecutive lines (VTT often repeats)
+    cleaned = []
+    for line in text_lines:
+        if not cleaned or line != cleaned[-1]:
+            cleaned.append(line)
+
+    return " ".join(cleaned).strip()
 
 
 def process_youtube_url(url: str) -> dict:
