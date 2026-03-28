@@ -24,16 +24,23 @@ VIDEO METADATA (secondary context only):
 
 YOUR TASKS:
 
+⚠️ LANGUAGE RULE — MOST IMPORTANT:
+Detect the language of the transcript.
+Write 100% of your output in that exact same language.
+Zero English words allowed if the transcript is Arabic.
+Zero Arabic words allowed if the transcript is English.
+Not even brand names, technical terms, or hashtags should break this rule.
+
 ⚠️ CRITICAL RULE: You MUST base all output on the actual VIDEO TRANSCRIPT above.
 Do NOT generate generic titles. Every title, description, and concept must reflect
 the SPECIFIC topics, stories, moments, and details found in the transcript.
 If the transcript is in Arabic, generate output in Arabic. English → English. Etc.
 
 - CRITICAL: Write titles and descriptions and thumbnail concepts in ONE language only — the same language as the transcript
-- Do NOT mix English words into Arabic titles, descriptions, or thumbnail concepts
+- Do NOT mix English words into Arabic titles
 - If the transcript is in Arabic (Darija or MSA), every single word in every title, description, and thumbnail concept must be Arabic
 
-1. TITLES: Write exactly 10 YouTube titles.
+1. TITLES: Write exactly 5 YouTube titles.
    - FIRST read the transcript carefully and identify: the main topic, key moments, surprising facts, conflicts, results, or stories
    - THEN build each title around one of those specific extracted points
    - A title must be a complete meaningful phrase — minimum 6 words
@@ -42,19 +49,19 @@ If the transcript is in Arabic, generate output in Arabic. English → English. 
    - Use formats like: "How X led to Y", "Why X is changing Y", "X things about Y that Z", "The truth about X that nobody talks about"
    - Apply these formats in whatever language the transcript is in
    - Match creator style preferences: {style}
-   - Number them 1-10
+   - Number them 1-5
 
-2. DESCRIPTIONS: Write exactly 3 full YouTube descriptions.
+2. DESCRIPTIONS: Write exactly 2 full YouTube descriptions.
    - Each MUST mention specific points, moments, or insights from the transcript
    - Include: hook, key points, CTA, relevant hashtags
    - 150-200 words each
-   - Number them 1-3
+   - Number them 1-2
 
-3. THUMBNAIL_CONCEPTS: Write exactly 5 thumbnail concepts.
+3. THUMBNAIL_CONCEPTS: Write exactly 3 thumbnail concepts.
    - Each MUST be based on a specific moment or topic from the transcript
    - Describe: visual layout, colors, facial expression, overlay text
    - Specific enough to hand to a designer
-   - Number them 1-5
+   - Number them 1-3
 
 FORMATTING RULES:
 - Use EXACTLY these headers: TITLES:, DESCRIPTIONS:, THUMBNAIL_CONCEPTS:

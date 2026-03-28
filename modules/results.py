@@ -25,9 +25,9 @@ def show_results(ai_result: dict, video_data: dict):
 
     # ── 3 Tabs ─────────────────────────────────────────────────
     tab_titles, tab_descriptions, tab_thumbnails = st.tabs([
-        "Titles (10)",
-        "Descriptions (3)",
-        "Thumbnail Concepts (5)"
+        "Titles (5)",
+        "Descriptions (2)",
+        "Thumbnail Concepts (3)"
     ])
 
     # ── Tab 1: Titles ──────────────────────────────────────────
