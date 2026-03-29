@@ -81,20 +81,9 @@ def restore_session():
         return  # Already have a session, nothing to do
 
     try:
-        session = supabase.auth.get_session()
-        if session and session.user:
-            st.session_state["user"] = session.user
-            st.session_state["session"] = session
-    except Exception:
-        pass  # No session found — user will see login page
-
-def restore_session():
-    if "user" in st.session_state:
-        return
-    try:
         response = supabase.auth.get_session()
         if response and response.session and response.session.user:
             st.session_state["user"] = response.session.user
             st.session_state["session"] = response.session
     except Exception:
-        pass
+        pass  # No session found — user will see login page

@@ -6,10 +6,11 @@ from modules.youtube_fetcher import process_youtube_url
 from modules.rate_limiter import check_rate_limit, increment_usage
 from modules.ai_generator import generate_content
 from modules.results import show_results
+from config import APP_ICON, APP_NAME
 
 st.set_page_config(
-    page_title="VidLoop AI",
-    page_icon="🎬",
+    page_title=APP_NAME,
+    page_icon=APP_ICON,
     layout="centered"
 )
 
