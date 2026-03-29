@@ -62,6 +62,7 @@ def fetch_transcript_from_captions(video_id: str) -> str | None:
                 "writeautomaticsub": True,     # get auto-generated subs
                 "writesubtitles": True,        # get manual subs too
                 "subtitlesformat": "vtt",      # vtt format
+                "subtitleslangs": ["all"],
                 "outtmpl": os.path.join(tmpdir, "sub"),
             }
 
