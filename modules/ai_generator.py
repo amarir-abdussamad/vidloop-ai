@@ -3,7 +3,7 @@ from groq import Groq
 from modules.prompt_builder import build_prompt
 
 
-def generate_content(user_profile: dict, video_data: dict) -> dict:
+def generate_content(user_profile: dict, video_data: dict, language: str = "Auto-detect") -> dict:
     """
     Send the built prompt to Groq LLaMA 3.3 70B and parse the response
     into a structured dict with titles, descriptions, and thumbnail concepts.
@@ -18,7 +18,7 @@ def generate_content(user_profile: dict, video_data: dict) -> dict:
     """
     try:
         client = Groq(api_key=st.secrets["GROQ_API_KEY"])
-        prompt = build_prompt(user_profile, video_data)
+        prompt = build_prompt(user_profile, video_data, language)
 
         response = client.chat.completions.create(
             model="llama-3.3-70b-versatile",

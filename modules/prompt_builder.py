@@ -1,4 +1,4 @@
-def build_prompt(user_profile: dict, video_data: dict) -> str:
+def build_prompt(user_profile: dict, video_data: dict, language: str = "Auto-detect") -> str:
     tags = ", ".join(video_data.get("tags", [])) or "None"
     style = user_profile.get("style_preferences", "No preference")
     transcript = video_data.get("transcript", "")
@@ -52,6 +52,9 @@ Extract these 4 things from the transcript and metadata:
 - Current tags: {tags}
 
 YOUR TASK (strictly follow STEP 1, STEP 2 and the language rule):
+
+OUTPUT LANGUAGE INSTRUCTION:
+{"Detect the language from the transcript and write everything in that language." if language == "Auto-detect" else f"Write ALL output in {language} — every single word, no exceptions."}
 
 1. TITLES: Write exactly 5 YouTube titles.
    - Base every title on specific moments from the transcript.

@@ -1,3 +1,5 @@
+from unittest import result
+
 import streamlit as st
 import time
 from modules.auth import show_auth_page, logout, restore_session
@@ -61,10 +63,14 @@ st.divider()
 
 with st.form("analyze_form"):
     url = st.text_input(
-        "YouTube Video URL",
+        "🔗 YouTube Video URL",
         placeholder="https://www.youtube.com/watch?v=...",
     )
-    submitted = st.form_submit_button("Analyze Video", use_container_width=True)
+    language = st.selectbox(
+        "🌍 Output language:",
+        ["Auto-detect", "English", "Arabic", "French", "Spanish", "German"]
+    )
+    submitted = st.form_submit_button("🚀 Analyze Video", use_container_width=True)
 
 if submitted:
     if not url:
@@ -100,7 +106,8 @@ if submitted:
     with st.spinner("AI is generating your titles, descriptions, and thumbnail concepts..."):
         ai_result = generate_content(
             user_profile=st.session_state["user_profile"],
-            video_data=video_data
+            video_data=video_data,
+            language=language
         )
 
     if "error" in ai_result:
