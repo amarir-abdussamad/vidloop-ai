@@ -87,6 +87,6 @@ urllib3==2.6.3
 watchdog==6.0.0
 websockets==15.0.1
 yarl==1.23.0
-youtube-transcript-api==1.2.4
+youtube-transcript-api==0.6.3
 yt-dlp==2026.3.17
 zstandard==0.25.0
