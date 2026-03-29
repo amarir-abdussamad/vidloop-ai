@@ -47,8 +47,8 @@ Extract these 4 things from the transcript and metadata:
 YOUR TASK (strictly follow STEP 1, STEP 2 and the language rule):
 
 OUTPUT LANGUAGE INSTRUCTION:
-{"Detect the language from the transcript ONLY. Write 100% of output in that exact language. Zero mixing. No exceptions." if language == "Auto-detect" else f"Write ALL output in {language} — every single word, no exceptions, including hashtags."}
-
+{"Detect the language from the SPOKEN CONTENT of the transcript, not the caption language metadata. Write 100% of output in that exact spoken language." if language == "Auto-detect" else f"Write ALL output in {language} — every single word, no exceptions."}
+STRICT RULE: Output EXACTLY 5 titles, EXACTLY 2 descriptions, EXACTLY 3 thumbnail concepts. No more, no less.
 1. TITLES: Write exactly 5 YouTube titles.
    - Base every title on specific moments from the transcript.
    - Minimum 6 words per title.

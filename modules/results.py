@@ -40,7 +40,7 @@ def show_results(ai_result: dict, video_data: dict):
     # ── Tab 2: Descriptions ────────────────────────────────────
     with tab_descriptions:
         st.subheader("2 Full YouTube Descriptions")
-        st.caption()
+        st.caption("Edit if needed, then copy")
         st.divider()
         descriptions = ai_result.get("descriptions", [])
         for i, desc in enumerate(descriptions, 1):
