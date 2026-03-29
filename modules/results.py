@@ -1,5 +1,4 @@
 import streamlit as st
-from st_copy_to_clipboard import st_copy_to_clipboard
 
 
 def show_results(ai_result: dict, video_data: dict):
@@ -35,20 +34,17 @@ def show_results(ai_result: dict, video_data: dict):
     # ── Tab 1: Titles ──────────────────────────────────────────
     with tab_titles:
         st.subheader(f"{len(titles)} Click-Worthy Titles")
-        st.caption("Click the copy button next to any title 👇")
+        st.caption("Click the copy icon on the right of each box 👇")
         st.divider()
 
         for i, title in enumerate(titles, 1):
-            col_text, col_btn = st.columns([5, 1])
-            with col_text:
-                st.markdown(f"**{i}.** {title}")
-            with col_btn:
-                st_copy_to_clipboard(title, key=f"copy_title_{i}")
+            st.markdown(f"**{i}.**")
+            st.code(title, language=None)
 
     # ── Tab 2: Descriptions ────────────────────────────────────
     with tab_descriptions:
         st.subheader(f"{len(descriptions)} Full YouTube Descriptions")
-        st.caption("Edit if you want, then copy with one click")
+        st.caption("Edit below, then copy the final version")
         st.divider()
 
         for i, desc in enumerate(descriptions, 1):
@@ -60,7 +56,8 @@ def show_results(ai_result: dict, video_data: dict):
                 label_visibility="collapsed",
                 key=f"desc_area_{i}"
             )
-            st_copy_to_clipboard(edited, key=f"copy_desc_{i}")
+            st.caption("Copy final version 👇")
+            st.code(edited, language=None)
             st.divider()
 
     # ── Tab 3: Thumbnail Concepts ──────────────────────────────
@@ -71,5 +68,4 @@ def show_results(ai_result: dict, video_data: dict):
 
         for i, concept in enumerate(concepts, 1):
             with st.expander(f"Concept {i} 🖼️", expanded=(i == 1)):
-                st.write(concept)
-                st_copy_to_clipboard(concept, key=f"copy_concept_{i}")
+                st.code(concept, language=None)
