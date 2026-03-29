@@ -1,5 +1,3 @@
-from unittest import result
-
 import streamlit as st
 import time
 from modules.auth import show_auth_page, logout, restore_session
@@ -41,7 +39,9 @@ if "user_profile" not in st.session_state:
 st.sidebar.title("VidLoop AI")
 st.sidebar.write(f"{st.session_state['user'].email}")
 profile = st.session_state["user_profile"]
-tier = "free"
+
+# FIX: read tier from profile instead of hardcoding "free"
+tier = profile.get("tier", "free") if profile else "free"
 
 if profile:
     st.sidebar.write(f"{profile.get('niche', 'N/A')}")
@@ -120,5 +120,7 @@ if submitted:
     increment_usage(user_id, tier)
     st.session_state["last_analysis_time"] = time.time()
 
-    # ── Step 4: Show results ───────────────────────────────────
-    show_results(ai_result, video_data)
+# FIX: show results outside the `if submitted:` block so they
+# survive reruns (e.g. when user clicks a copy button)
+if "ai_result" in st.session_state and "video_data" in st.session_state:
+    show_results(st.session_state["ai_result"], st.session_state["video_data"])

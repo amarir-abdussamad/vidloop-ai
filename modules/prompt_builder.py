@@ -7,16 +7,16 @@ def build_prompt(user_profile: dict, video_data: dict, language: str = "Auto-det
 You are an expert YouTube content strategist.
 
 === LANGUAGE RULE — THIS IS THE MOST IMPORTANT RULE ===
-1. First, detect the language of the VIDEO TRANSCRIPT above.
+1. First, detect the language of the VIDEO TRANSCRIPT below.
 2. You MUST write 100% of your entire output in that EXACT same language.
 3. Zero mixing allowed.
 4. Brand names, technical terms, and single words that appeared in the transcript may stay as they are.
    Everything else must be in the detected language.
 
-=== STEP 1 — BEFORE WRITING ANYTHING, ANALYZE THE VIDEO ===
-Extract these 4 things from the transcript and metadata:
-1. TOPIC: What is this video specifically about? (1 short sentence)
-2. TONE: What is the emotional mood? Choose EXACTLY ONE from this list:
+=== STEP 1 — INTERNAL REASONING ONLY (DO NOT OUTPUT THIS, KEEP IT IN YOUR HEAD) ===
+Before writing anything, silently think about these 4 things. Do NOT print them:
+1. TOPIC: What is this video specifically about?
+2. TONE: What is the emotional mood? Pick one:
    - 😂 Comedy/Humor → use jokes, exaggeration, funny hooks
    - 😱 Shocking/Controversial → use curiosity, disbelief, "I can't believe..."
    - 🎓 Educational → use "how to", "learn", "discover", numbers
@@ -30,11 +30,11 @@ Extract these 4 things from the transcript and metadata:
 3. AUDIENCE: Who is watching this? (age group + main interests)
 4. HOOK: What is the most surprising or interesting moment in the transcript?
 
-=== STEP 2 — USE THE 4 POINTS ABOVE ===
+=== STEP 2 — USE YOUR INTERNAL ANALYSIS TO WRITE THE OUTPUT ===
 - Every title, description, and thumbnail concept MUST match the detected TONE.
 - Never mix tones. If it's a comedy video → keep everything funny.
 - If it's finance → keep it professional with numbers and results.
-- Use appropriate emojis naturally in titles and descriptions to make them more engaging (1-2 emojis max per title, a few in descriptions).
+- Use appropriate emojis naturally in titles and descriptions (1-2 emojis max per title, a few in descriptions).
 
 === CREATOR PROFILE ===
 - Niche: {user_profile.get("niche", "Unknown")}
@@ -51,10 +51,10 @@ Extract these 4 things from the transcript and metadata:
 - Likes: {video_data.get("like_count", 0):,}
 - Current tags: {tags}
 
-YOUR TASK (strictly follow STEP 1, STEP 2 and the language rule):
-
 OUTPUT LANGUAGE INSTRUCTION:
 {"Detect the language from the transcript and write everything in that language." if language == "Auto-detect" else f"Write ALL output in {language} — every single word, no exceptions."}
+
+YOUR OUTPUT — start immediately with TITLES: and nothing else before it:
 
 1. TITLES: Write exactly 5 YouTube titles.
    - Base every title on specific moments from the transcript.
@@ -74,7 +74,7 @@ OUTPUT LANGUAGE INSTRUCTION:
    - Based on specific transcript moments and the detected TONE.
    - Number them 1-3.
 
-FORMATTING (do not add any extra text):
+FORMATTING — output ONLY these three sections, nothing else before or between them:
 TITLES:
 DESCRIPTIONS:
 THUMBNAIL_CONCEPTS:
