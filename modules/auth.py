@@ -71,19 +71,3 @@ def logout():
     supabase.auth.sign_out()
     st.session_state.clear()
     st.rerun()
-
-def restore_session():
-    """
-    Called on every app load. Tries to restore the Supabase session
-    so the user doesn't have to log in again after a refresh.
-    """
-    if "user" in st.session_state:
-        return  # Already have a session, nothing to do
-
-    try:
-        response = supabase.auth.get_session()
-        if response and response.session and response.session.user:
-            st.session_state["user"] = response.session.user
-            st.session_state["session"] = response.session
-    except Exception:
-        pass  # No session found — user will see login page

@@ -52,37 +52,44 @@ def fetch_transcript_from_captions(video_id: str) -> str | None:
     import yt_dlp
     import os
     import tempfile
+    import time
 
-    try:
-        with tempfile.TemporaryDirectory() as tmpdir:
-            ydl_opts = {
-                "quiet": True,
-                "no_warnings": True,
-                "skip_download": True,        # don't download video
-                "writeautomaticsub": True,     # get auto-generated subs
-                "writesubtitles": True,        # get manual subs too
-                "subtitlesformat": "vtt",      # vtt format
-                "subtitleslangs": ["all"],
-                "outtmpl": os.path.join(tmpdir, "sub"),
-            }
+    for attempt in range(3):  # retry up to 3 times
+        try:
+            with tempfile.TemporaryDirectory() as tmpdir:
+                ydl_opts = {
+                    "quiet": True,
+                    "no_warnings": True,
+                    "skip_download": True,
+                    "writeautomaticsub": True,
+                    "writesubtitles": True,
+                    "subtitlesformat": "vtt",
+                    "subtitleslangs": ["all"],
+                    "outtmpl": os.path.join(tmpdir, "sub"),
+                    "sleep_interval": 2,        # wait between requests
+                    "max_sleep_interval": 5,
+                }
 
-            url = f"https://www.youtube.com/watch?v={video_id}"
+                url = f"https://www.youtube.com/watch?v={video_id}"
 
-            with yt_dlp.YoutubeDL(ydl_opts) as ydl:
-                info = ydl.extract_info(url, download=True)
+                with yt_dlp.YoutubeDL(ydl_opts) as ydl:
+                    ydl.extract_info(url, download=True)
 
-            # Find the downloaded subtitle file
-            for f in os.listdir(tmpdir):
-                if f.endswith(".vtt"):
-                    with open(os.path.join(tmpdir, f), "r", encoding="utf-8") as file:
-                        vtt_content = file.read()
-                    return _parse_vtt(vtt_content)
+                for f in os.listdir(tmpdir):
+                    if f.endswith(".vtt"):
+                        with open(os.path.join(tmpdir, f), "r", encoding="utf-8") as file:
+                            vtt_content = file.read()
+                        return _parse_vtt(vtt_content)
 
+                return None
+
+        except Exception as e:
+            if "429" in str(e) and attempt < 2:
+                time.sleep(5 * (attempt + 1))  # wait 5s, then 10s
+                continue
+            st.warning(f"Caption error: {e}")
             return None
-
-    except Exception as e:
-        st.warning(f"Caption error: {e}")
-        return None
+    return None
 
 
 def _parse_vtt(vtt: str) -> str:

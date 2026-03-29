@@ -6,13 +6,6 @@ def build_prompt(user_profile: dict, video_data: dict, language: str = "Auto-det
     return f"""
 You are an expert YouTube content strategist.
 
-=== LANGUAGE RULE — THIS IS THE MOST IMPORTANT RULE ===
-1. First, detect the language of the VIDEO TRANSCRIPT above.
-2. You MUST write 100% of your entire output in that EXACT same language.
-3. Zero mixing allowed.
-4. Brand names, technical terms, and single words that appeared in the transcript may stay as they are.
-   Everything else must be in the detected language.
-
 === STEP 1 — BEFORE WRITING ANYTHING, ANALYZE THE VIDEO ===
 Extract these 4 things from the transcript and metadata:
 1. TOPIC: What is this video specifically about? (1 short sentence)
@@ -54,7 +47,7 @@ Extract these 4 things from the transcript and metadata:
 YOUR TASK (strictly follow STEP 1, STEP 2 and the language rule):
 
 OUTPUT LANGUAGE INSTRUCTION:
-{"Detect the language from the transcript and write everything in that language." if language == "Auto-detect" else f"Write ALL output in {language} — every single word, no exceptions."}
+{"Detect the language from the transcript ONLY. Write 100% of output in that exact language. Zero mixing. No exceptions." if language == "Auto-detect" else f"Write ALL output in {language} — every single word, no exceptions, including hashtags."}
 
 1. TITLES: Write exactly 5 YouTube titles.
    - Base every title on specific moments from the transcript.
