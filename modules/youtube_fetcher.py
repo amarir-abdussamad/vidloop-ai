@@ -2,7 +2,6 @@ import re
 import streamlit as st
 from googleapiclient.discovery import build
 from youtube_transcript_api import YouTubeTranscriptApi
-from groq import Groq
 
 
 def extract_video_id(url: str) -> str | None:
@@ -49,70 +48,25 @@ def fetch_video_metadata(video_id: str) -> dict:
 
 
 def fetch_transcript_from_captions(video_id: str) -> str | None:
-    import yt_dlp
-    import os
-    import tempfile
-
     try:
-        with tempfile.TemporaryDirectory() as tmpdir:
-            ydl_opts = {
-                "quiet": True,
-                "no_warnings": True,
-                "skip_download": True,        # don't download video
-                "writeautomaticsub": True,     # get auto-generated subs
-                "writesubtitles": True,        # get manual subs too
-                "subtitlesformat": "vtt",      # vtt format
-                "subtitleslangs": ["all"],
-                "outtmpl": os.path.join(tmpdir, "sub"),
-            }
+        transcript_list = YouTubeTranscriptApi.list_transcripts(video_id)
 
-            url = f"https://www.youtube.com/watch?v={video_id}"
+        # Try manual captions first, then auto-generated
+        try:
+            transcript = transcript_list.find_manually_created_transcript(
+                ['ar', 'en', 'fr', 'es', 'de', 'tr', 'hi', 'pt', 'ru', 'ja', 'ko']
+            )
+        except Exception:
+            transcript = transcript_list.find_generated_transcript(
+                ['ar', 'en', 'fr', 'es', 'de', 'tr', 'hi', 'pt', 'ru', 'ja', 'ko']
+            )
 
-            with yt_dlp.YoutubeDL(ydl_opts) as ydl:
-                info = ydl.extract_info(url, download=True)
-
-            # Find the downloaded subtitle file
-            for f in os.listdir(tmpdir):
-                if f.endswith(".vtt"):
-                    with open(os.path.join(tmpdir, f), "r", encoding="utf-8") as file:
-                        vtt_content = file.read()
-                    return _parse_vtt(vtt_content)
-
-            return None
+        data = transcript.fetch()
+        return " ".join([entry.text for entry in data])
 
     except Exception as e:
         st.warning(f"Caption error: {e}")
         return None
-
-
-def _parse_vtt(vtt: str) -> str:
-    """Strip VTT timestamps and formatting, return plain text."""
-    import re
-    lines = vtt.split("\n")
-    text_lines = []
-    for line in lines:
-        line = line.strip()
-        # Skip empty lines, WEBVTT header, timestamps, and NOTE lines
-        if not line:
-            continue
-        if line.startswith("WEBVTT") or line.startswith("NOTE") or line.startswith("Kind:") or line.startswith("Language:"):
-            continue
-        if re.match(r"^\d{2}:\d{2}", line):  # timestamp line
-            continue
-        if re.match(r"^\d+$", line):  # sequence number
-            continue
-        # Remove HTML tags like <c>, </c>, <00:00:00.000>
-        line = re.sub(r"<[^>]+>", "", line)
-        if line:
-            text_lines.append(line)
-
-    # Remove duplicate consecutive lines (VTT often repeats)
-    cleaned = []
-    for line in text_lines:
-        if not cleaned or line != cleaned[-1]:
-            cleaned.append(line)
-
-    return " ".join(cleaned).strip()
 
 
 def process_youtube_url(url: str) -> dict:
@@ -137,6 +91,6 @@ def process_youtube_url(url: str) -> dict:
         "channel_title": metadata["channel_title"],
         "view_count": metadata["view_count"],
         "like_count": metadata["like_count"],
-        "transcript": transcript[:8000],
+        "transcript": transcript[:3000],
         "transcript_source": "YouTube Captions"
     }
