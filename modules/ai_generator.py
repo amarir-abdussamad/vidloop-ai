@@ -21,7 +21,7 @@ def generate_content(user_profile: dict, video_data: dict, language: str = "Auto
         prompt = build_prompt(user_profile, video_data, language)
 
         response = client.chat.completions.create(
-            model="llama-3.3-70b-versatile",
+            model="llama-3.1-8b-instant",
             messages=[{"role": "user", "content": prompt}],
             temperature=0.8,      # slightly creative but not random
             max_tokens=4000,      # enough for all 3 sections
